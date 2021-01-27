@@ -6,17 +6,17 @@ const storage = require("../utils/storage");
 describe("Exercise API", () => {
   const initialExercises = [
     {
-      date: "1-1-2021",
+      date: "2021-01-27T20:56:59.806Z",
       distance: 1.23,
     },
     {
-      date: "12-11-2021",
+      date: "2021-01-27T21:56:59.806Z",
       distance: 10.01,
     },
   ];
   beforeEach(() => {
     storage.clear();
-    storage.add(initialExercises);
+    initialExercises.forEach((exercise) => storage.add(exercise));
   });
 
   describe("GET /api/exercises - all exercises", () => {
@@ -26,43 +26,46 @@ describe("Exercise API", () => {
     test("responds with all entries", async () => {
       await api.get("/api/exercises").expect(initialExercises);
     });
-    test("responds with 400 status code when missing params", () => {
-      expect(1).toBe(0);
-    });
   });
 
   describe("POST /api/exercises - submit exercise", () => {
     const path = "/api/exercises";
     const points = {
-      start: "Kasztelańska 9, Kraków, Polska",
-      end: "Bajeczna 4a, Kraków, Polska",
+      start: "Wawel 5, Kraków, Polska",
+      end: "Waszyngtona 1, Kraków, Polska",
     };
-    const distance = 12.34;
+    const distance = 2.92;
+
     test("saves exercise to storage with correct data", async () => {
-      const storageBefore = storage.read();
+      const exercisesBefore = storage.read().exercises;
 
-      await api
-        .post(path)
-        .set("accept", "application/json")
-        .send(JSON.stringify(points));
+      await api.post(path).set("accept", "application/json").send(points);
 
-      const storageAfter = storage.read();
-      const savedExercise = storageAfter.slice(-1);
+      const exercisesAfter = storage.read().exercises;
+      const savedExercise = exercisesAfter.slice(-1).pop();
+      console.log(savedExercise);
 
-      expect(storageAfter.length - storageBefore.length).toBe(1);
+      expect(exercisesAfter.length - exercisesBefore.length).toBe(1);
       expect(savedExercise).toHaveProperty("date");
       expect(savedExercise).toHaveProperty("distance", distance);
     });
+
     test("responds with 201 status code", async () => {
       await api.post(path).expect(201);
     });
+
     test("responds with saved exercise", async () => {
-      const exercise = { date: Date.now(), distance: 12.34 };
-      await api
+      const response = await api
         .post(path)
         .set("accept", "application/json")
-        .send(JSON.stringify(points))
-        .expect(exercise);
+        .send(points);
+
+      expect(response.body).toHaveProperty("date");
+      expect(response.body).toHaveProperty("distance", distance);
+    });
+
+    test("responds with 400 status code when missing params", () => {
+      expect(1).toBe(0);
     });
   });
 });

@@ -1,0 +1,7 @@
+POST http://localhost:3001/api/exercises
+Content-Type: application/json
+
+{
+  "start": "Wawel 5, Kraków, Polska",
+  "end": "Waszyngtona 1, Kraków, Polska"
+}

@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const storage = require("./utils/storage");
+const calculateDistance = require("./utils/calculateDistance");
 
 const app = express();
 
@@ -12,8 +13,15 @@ app.get("/api/ping", async (req, res) => {
 });
 
 app.get("/api/exercises", (req, res) => {
-  const data = storage.read();
-  res.json(data);
+  const exercises = storage.read().exercises;
+  res.json(exercises);
+});
+
+app.post("/api/exercises", async (req, res) => {
+  const distance = await calculateDistance(req.body.start, req.body.end);
+  const exercise = { date: new Date().toISOString(), distance };
+  storage.add(exercise);
+  res.status(201).json(exercise);
 });
 
 const unknownEndpoint = (req, res) => {
