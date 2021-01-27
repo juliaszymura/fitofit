@@ -16,7 +16,7 @@ describe("Exercise API", () => {
   ];
   beforeEach(() => {
     storage.clear();
-    storage.save(initialExercises);
+    storage.add(initialExercises);
   });
 
   describe("GET /api/exercises - all exercises", () => {

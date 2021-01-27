@@ -3,10 +3,10 @@ const calculateDistance = require("../utils/calculateDistance");
 describe("Calculate distance from geocode", () => {
   test("calculates distance correctly", async () => {
     const distance = await calculateDistance(
-      "Gliniana 16, Kraków, Polska",
-      "Kasztelańska 9, Kraków, Polska"
+      "Wawel 5, Kraków, Polska",
+      "Waszyngtona 1, Kraków, Polska"
     );
 
-    expect(distance).toBe(6.038);
+    expect(distance).toBe(2.92);
   });
 });

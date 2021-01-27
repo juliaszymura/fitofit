@@ -19,7 +19,7 @@ const calculateDistance = async (start, end) => {
     const distance =
       geolib.getDistance(startCoordinates, endCoordinates) / 1000;
 
-    return distance;
+    return Number(distance.toFixed(2));
   } catch (error) {
     console.error(error);
   }

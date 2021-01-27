@@ -4,8 +4,13 @@ const fs = require("fs");
 const storageFile =
   process.env.NODE_ENV === "test" ? "storage_test.json" : "storage_prod.json";
 
-const save = (object) => {
-  jsonfile.writeFileSync(storageFile, object, { flag: "a", spaces: 2 });
+const add = (object) => {
+  const storedExercises = read();
+  storedExercises.push(object);
+  jsonfile.writeFileSync(storageFile, storedExercises, {
+    flag: "w",
+    spaces: 2,
+  });
 };
 
 const read = () => {
@@ -19,4 +24,4 @@ const clear = () => {
   fs.closeSync(fs.openSync(storageFile, "w"));
 };
 
-module.exports = { save, read, clear };
+module.exports = { add, read, clear };
