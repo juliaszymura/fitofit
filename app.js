@@ -18,10 +18,15 @@ app.get("/api/exercises", (req, res) => {
 });
 
 app.post("/api/exercises", async (req, res) => {
-  const distance = await calculateDistance(req.body.start, req.body.end);
-  const exercise = { date: new Date().toISOString(), distance };
-  storage.add(exercise);
-  res.status(201).json(exercise);
+  const body = req.body;
+  if (!body.start || !body.end) {
+    res.status(400).json({ error: "missing start or end address" });
+  } else {
+    const distance = await calculateDistance(body.start, body.end);
+    const exercise = { date: new Date().toISOString(), distance };
+    storage.add(exercise);
+    res.status(201).json(exercise);
+  }
 });
 
 const unknownEndpoint = (req, res) => {

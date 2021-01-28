@@ -23,6 +23,11 @@ describe("Exercise API", () => {
     test("responds with 200 status code", async () => {
       await api.get("/api/exercises").expect(200);
     });
+    test("responds with json format", async () => {
+      await api
+        .get("/api/exercises")
+        .expect("Content-Type", /application\/json/);
+    });
     test("responds with all entries", async () => {
       await api.get("/api/exercises").expect(initialExercises);
     });
@@ -43,7 +48,6 @@ describe("Exercise API", () => {
 
       const exercisesAfter = storage.read().exercises;
       const savedExercise = exercisesAfter.slice(-1).pop();
-      console.log(savedExercise);
 
       expect(exercisesAfter.length - exercisesBefore.length).toBe(1);
       expect(savedExercise).toHaveProperty("date");
@@ -51,7 +55,11 @@ describe("Exercise API", () => {
     });
 
     test("responds with 201 status code", async () => {
-      await api.post(path).expect(201);
+      await api
+        .post(path)
+        .set("accept", "application/json")
+        .send(points)
+        .expect(201);
     });
 
     test("responds with saved exercise", async () => {
@@ -64,7 +72,23 @@ describe("Exercise API", () => {
       expect(response.body).toHaveProperty("distance", distance);
     });
 
-    test("responds with 400 status code when missing params", () => {
+    test("responds with 400 status code when missing address", async () => {
+      await api.post(path).set("accept", "application/json").expect(400);
+
+      await api
+        .post(path)
+        .set("accept", "application/json")
+        .send(points.start)
+        .expect(400);
+
+      await api
+        .post(path)
+        .set("accept", "application/json")
+        .send(points.end)
+        .expect(400);
+    });
+
+    test("responds with 400 status code when provided incorrect address", async () => {
       expect(1).toBe(0);
     });
   });
