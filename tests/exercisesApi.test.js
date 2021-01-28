@@ -72,24 +72,38 @@ describe("Exercise API", () => {
       expect(response.body).toHaveProperty("distance", distance);
     });
 
-    test("responds with 400 status code when missing address", async () => {
-      await api.post(path).set("accept", "application/json").expect(400);
+    test("responds with 400 status code and error message when missing address", async () => {
+      const errorMessage = { error: "missing start or end address" };
+      await api
+        .post(path)
+        .set("accept", "application/json")
+        .expect(400)
+        .expect(errorMessage);
 
       await api
         .post(path)
         .set("accept", "application/json")
         .send(points.start)
-        .expect(400);
+        .expect(400)
+        .expect(errorMessage);
 
       await api
         .post(path)
         .set("accept", "application/json")
         .send(points.end)
-        .expect(400);
+        .expect(400)
+        .expect(errorMessage);
     });
 
-    test("responds with 400 status code when provided incorrect address", async () => {
-      expect(1).toBe(0);
+    test("responds with 400 status code and error message when provided incorrect address", async () => {
+      const errorMessage = { error: "invalid address" };
+
+      await api
+        .post(path)
+        .set("accept", "application/json")
+        .send({ start: "hdfjdhfjdfshf", end: points.end })
+        .expect(400)
+        .expect(errorMessage);
     });
   });
 });
