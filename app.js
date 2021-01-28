@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const storage = require("./utils/storage");
 const calculateDistance = require("./utils/calculateDistance");
 const { unknownEndpoint, errorHandler } = require("./utils/middleware");
+const groupByDay = require("./utils/groupByDay");
 
 const app = express();
 
@@ -17,6 +18,16 @@ app.get("/api/ping", async (req, res) => {
 app.get("/api/exercises", (req, res) => {
   const exercises = storage.read().exercises;
   res.json(exercises);
+});
+
+app.get("/api/exercises/grouped/current-month", (req, res) => {
+  const exercises = storage.read().exercises;
+  const current = exercises
+    .filter(
+      (ex) => new Date(ex.date).getFullYear() === new Date().getFullYear()
+    )
+    .filter((ex) => new Date(ex.date).getMonth() === new Date().getMonth());
+  res.json(groupByDay(current));
 });
 
 app.post("/api/exercises", async (req, res) => {

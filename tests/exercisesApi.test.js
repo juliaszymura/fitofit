@@ -6,6 +6,18 @@ const storage = require("../utils/storage");
 describe("Exercise API", () => {
   const initialExercises = [
     {
+      date: "2021-01-03T20:56:59.806Z",
+      distance: 6.34,
+    },
+    {
+      date: "2021-01-12T21:56:59.806Z",
+      distance: 16.1,
+    },
+    {
+      date: "2021-01-17T21:56:59.806Z",
+      distance: 34.68,
+    },
+    {
       date: "2021-01-27T20:56:59.806Z",
       distance: 1.23,
     },
@@ -23,13 +35,37 @@ describe("Exercise API", () => {
     test("responds with 200 status code", async () => {
       await api.get("/api/exercises").expect(200);
     });
+
     test("responds with json format", async () => {
       await api
         .get("/api/exercises")
         .expect("Content-Type", /application\/json/);
     });
+
     test("responds with all entries", async () => {
       await api.get("/api/exercises").expect(initialExercises);
+    });
+  });
+
+  describe("GET /api/exercises/grouped/current-month - exercises from current month grouped by day", () => {
+    const path = "/api/exercises/grouped/current-month";
+    const groupedByDay = {
+      "2021-01-03": 6.34,
+      "2021-01-12": 16.1,
+      "2021-01-17": 34.68,
+      "2021-01-27": 11.24,
+    };
+
+    test("responds with 200 status code", async () => {
+      await api.get(path).expect(200);
+    });
+
+    test("responds with json format", async () => {
+      await api.get(path).expect("Content-Type", /application\/json/);
+    });
+
+    test("responds with exercises from current month grouped by day", async () => {
+      await api.get(path).expect(groupedByDay);
     });
   });
 
