@@ -22,12 +22,10 @@ app.get("/api/exercises", (req, res) => {
 
 app.get("/api/exercises/grouped/current-month", (req, res) => {
   const exercises = storage.read().exercises;
-  const current = exercises
-    .filter(
-      (ex) => new Date(ex.date).getFullYear() === new Date().getFullYear()
-    )
-    .filter((ex) => new Date(ex.date).getMonth() === new Date().getMonth());
-  res.json(groupByDay(current));
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const regex = new RegExp(currentMonth);
+  const exercisesCurrentMonth = exercises.filter((ex) => regex.test(ex.date));
+  res.json(groupByDay(exercisesCurrentMonth));
 });
 
 app.post("/api/exercises", async (req, res) => {
