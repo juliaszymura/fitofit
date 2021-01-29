@@ -11,10 +11,6 @@ const app = express();
 app.use(express.json());
 if (process.env.NODE_ENV !== "test") app.use(morgan("dev"));
 
-app.get("/api/ping", async (req, res) => {
-  res.send("pong");
-});
-
 app.get("/api/exercises", (req, res) => {
   const exercises = storage.read().exercises;
   res.json(exercises);

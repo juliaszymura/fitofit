@@ -3,9 +3,9 @@ const jsonfile = require("jsonfile");
 const storageFile =
   process.env.NODE_ENV === "test" ? "storage_test.json" : "storage_prod.json";
 
-const add = (object) => {
+const add = (exercise) => {
   const stored = read();
-  stored.exercises.push(object);
+  stored.exercises.push(exercise);
 
   jsonfile.writeFileSync(storageFile, stored, {
     flag: "w",
