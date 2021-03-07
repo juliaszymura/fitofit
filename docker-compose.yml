@@ -1,6 +1,20 @@
 version: "3.7"
 
 services:
+  app:
+    image: node
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - 3001:3001
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      PGUSER: fitofit
+      PGPASSWORD: Pass2021!
+      PGDATABASE: fitofit
+      PGHOST: postgres
+
   postgres:
     image: postgres
     volumes:

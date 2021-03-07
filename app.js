@@ -5,6 +5,7 @@ const storage = require("./utils/storage");
 const calculateDistance = require("./utils/calculateDistance");
 const { unknownEndpoint, errorHandler } = require("./utils/middleware");
 const groupByDay = require("./utils/groupByDay");
+const db = require("./db");
 
 const app = express();
 
@@ -12,6 +13,13 @@ app.use(express.json());
 if (process.env.NODE_ENV !== "test") app.use(morgan("dev"));
 
 app.get("/api/exercises", (req, res) => {
+  db.query("SELECT * FROM exercises", (err, res) => {
+    if (err) {
+      console.log(err.stack);
+    } else {
+      console.log(res.rows);
+    }
+  });
   const exercises = storage.read().exercises;
   res.json(exercises);
 });
