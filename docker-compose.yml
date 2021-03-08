@@ -26,5 +26,14 @@ services:
     ports:
       - 5432:5432
 
+  postgres-test:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: Pass2021!
+      POSTGRES_USER: fitofit
+      POSTGRES_DB: fitofit
+    ports:
+      - 5433:5432
+
 volumes:
   postgres-data:
