@@ -1,7 +1,6 @@
 const express = require("express");
 require("express-async-errors");
 const morgan = require("morgan");
-// const storage = require("./utils/storage");
 const calculateDistance = require("./utils/calculateDistance");
 const { unknownEndpoint, errorHandler } = require("./utils/middleware");
 const groupByDay = require("./utils/groupByDay");

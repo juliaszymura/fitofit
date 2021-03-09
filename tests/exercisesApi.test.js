@@ -45,13 +45,16 @@ describe("Exercises API", () => {
 
   beforeEach(async () => {
     await db.query("TRUNCATE exercises");
-    initialExercises.forEach(
-      async (exercise) =>
-        await db.query({
-          name: "add-exercise-test",
-          text: "INSERT INTO exercises (date, distance) VALUES ($1, $2)",
-          values: [exercise.date, exercise.distance],
-        })
+
+    await Promise.all(
+      initialExercises.map(
+        async (exercise) =>
+          await db.query({
+            name: "add-exercise-test",
+            text: "INSERT INTO exercises (date, distance) VALUES ($1, $2)",
+            values: [exercise.date, exercise.distance],
+          })
+      )
     );
   });
 
