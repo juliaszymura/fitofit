@@ -29,14 +29,7 @@ describe("Exercises API", () => {
     },
   ];
 
-  beforeAll(async () => {
-    await db.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
-    await db.query(`CREATE TABLE IF NOT EXISTS exercises (
-      id uuid PRIMARY KEY DEFAULT uuid_generate_v4() ,
-      date timestamp with time zone,
-      distance float
-    )`);
-  });
+  beforeAll(async () => await db.init());
 
   afterAll(async () => {
     await db.query("TRUNCATE exercises");
