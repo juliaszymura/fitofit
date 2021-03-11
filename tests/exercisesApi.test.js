@@ -32,7 +32,6 @@ describe("Exercises API", () => {
   beforeAll(async () => await db.init());
 
   afterAll(async () => {
-    await db.query("TRUNCATE exercises");
     await db.end();
   });
 

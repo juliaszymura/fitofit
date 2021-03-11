@@ -3,7 +3,6 @@ require("express-async-errors");
 const morgan = require("morgan");
 const calculateDistance = require("./utils/calculateDistance");
 const { unknownEndpoint, errorHandler } = require("./utils/middleware");
-const groupByDay = require("./utils/groupByDay");
 const db = require("./db");
 
 const app = express();
@@ -25,17 +24,25 @@ app.get("/api/exercises", async (req, res) => {
 app.get("/api/exercises/grouped/current-month", async (req, res) => {
   let response;
   try {
-    response = await db.query("SELECT * FROM exercises");
+    response = await db.query(`
+      SELECT TO_CHAR(DATE(date), 'YYYY-MM-DD') as date, SUM(distance) as distance
+      FROM exercises 
+      WHERE EXTRACT(YEAR FROM date) = EXTRACT(YEAR FROM CURRENT_DATE) 
+      AND EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM CURRENT_DATE)
+      GROUP BY DATE(date) 
+      ORDER BY date`);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
   }
-  const currentMonth = new Date().toISOString().slice(0, 7);
-  const regex = new RegExp(currentMonth);
-  const exercisesCurrentMonth = response.rows
-    .filter((ex) => regex.test(ex.date.toISOString()))
-    .map((ex) => ({ date: ex.date.toISOString(), distance: ex.distance }));
-  res.json(groupByDay(exercisesCurrentMonth));
+  const groupedCurrentMonth = response.rows.reduce(
+    (paired, current) => ({
+      ...paired,
+      [current.date]: current.distance,
+    }),
+    {}
+  );
+  res.json(groupedCurrentMonth);
 });
 
 app.post("/api/exercises", async (req, res) => {
