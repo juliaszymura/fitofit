@@ -11,12 +11,14 @@ npm start
 To start app in development mode:
 
 ```
-npm run dev
+docker-compose up
 ```
 
-To run tests:
+Tests are configured to run against a postgres database running in a container. To run tests:
 
 ```
+docker-compose up
+
 npm run test
 ```
 
