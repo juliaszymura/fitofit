@@ -1,9 +1,9 @@
 const supertest = require("supertest");
 const app = require("../app");
 const api = supertest(app);
-const storage = require("../utils/storage");
 const moment = require("moment");
 const groupByDay = require("../utils/groupByDay");
+const db = require("../db");
 
 describe("Exercises API", () => {
   const initialExercises = [
@@ -29,9 +29,25 @@ describe("Exercises API", () => {
     },
   ];
 
-  beforeEach(() => {
-    storage.clear();
-    initialExercises.forEach((exercise) => storage.add(exercise));
+  beforeAll(async () => await db.init());
+
+  afterAll(async () => {
+    await db.end();
+  });
+
+  beforeEach(async () => {
+    await db.query("TRUNCATE exercises");
+
+    await Promise.all(
+      initialExercises.map(
+        async (exercise) =>
+          await db.query({
+            name: "add-exercise-test",
+            text: "INSERT INTO exercises (date, distance) VALUES ($1, $2)",
+            values: [exercise.date, exercise.distance],
+          })
+      )
+    );
   });
 
   describe("GET /api/exercises - all exercises", () => {
@@ -46,7 +62,8 @@ describe("Exercises API", () => {
     });
 
     test("responds with all entries", async () => {
-      await api.get("/api/exercises").expect(initialExercises);
+      const response = await api.get("/api/exercises");
+      expect(response.body).toHaveLength(initialExercises.length);
     });
   });
 
@@ -79,14 +96,14 @@ describe("Exercises API", () => {
     const distance = 2.92;
 
     test("saves exercise to storage with correct data", async () => {
-      const exercisesBefore = storage.read().exercises;
+      const exercisesBefore = await db.query("SELECT * FROM exercises");
 
       await api.post(path).set("accept", "application/json").send(points);
 
-      const exercisesAfter = storage.read().exercises;
-      const savedExercise = exercisesAfter.slice(-1).pop();
+      const exercisesAfter = await db.query("SELECT * FROM exercises");
+      const savedExercise = exercisesAfter.rows.slice(-1).pop();
 
-      expect(exercisesAfter.length - exercisesBefore.length).toBe(1);
+      expect(exercisesAfter.rows.length - exercisesBefore.rows.length).toBe(1);
       expect(savedExercise).toHaveProperty("date");
       expect(savedExercise).toHaveProperty("distance", distance);
     });
